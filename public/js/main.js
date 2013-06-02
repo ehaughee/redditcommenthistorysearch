@@ -35,8 +35,7 @@ $(document).ready(function() {
 
 			$.getJSON('/search/' + user.val() + '/' + encodeURIComponent(text.val()),
 				function(comments) {
-					var template = Handlebars.compile(commentTemplate);
-					$("#search_results").html(generateResultTemplate);
+					$("#search_results").html(generateResultTemplate(comments));
 					that.innerText = "Search";
 					that.className = that.className.replace(/\bdisabled\b/,'');
 				}
@@ -61,18 +60,20 @@ $(document).ready(function() {
 				break;
 		}
 	});
-});
 
-function generateResultTemplate(comments, currentPage, itemsPerPage) {
-	if (typeof itemsPerPage === "undefined") {	itemsPerPage = 10 }
-	return  template({
-				comments: comments,
-				pagination: {
-					page: currentPage,
-					pageCount: Math.ceil(comments.length/itemsPerPage)
-				}
-			});
-}
+	function generateResultTemplate(comments, currentPage, itemsPerPage) {
+		var template = Handlebars.compile(commentTemplate);
+		if (typeof itemsPerPage === "undefined") {	itemsPerPage = 10 }
+		if (typeof currentPage === "undefined") { currentPage = 1 }
+		return template({
+					comments: comments,
+					pagination: {
+						page: currentPage,
+						pageCount: Math.ceil(comments.length/itemsPerPage)
+					}
+				});
+	}
+});
 
 // ===========================================
 // ================ Templates ================
@@ -97,7 +98,7 @@ var commentTemplate = [
 	"{{#each comments}}",
 	"<div class='row panel'>",
 	"<div class='large-12 columns'>",
-	"{{body}}<br>{{author}}",
+	"{{body}}<br><br>- {{author}}",
 	"</div>",
 	"</div>",
 	"{{/each}}"

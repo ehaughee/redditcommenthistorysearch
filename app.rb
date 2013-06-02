@@ -50,7 +50,7 @@ get '/check_user/:username' do |username|
 end
 
 # TODO: Fix route
-get '/search/filter/:username/:id' do |username, id|
+get '/search/:username/filter/:id' do |username, id|
   # filter = Filter.get(id)
   pass if filter.nil?
   # Search with filter stored in db
@@ -65,12 +65,17 @@ end
 
 def get_comments_by_user(username, limit = 1000000000)
   if cache_hit?(username)
+    logger.info "Cache hit on key: #{username}"
     comments = JSON.parse(redis.get(username))
   else
+    logger.info "Cache miss on key: #{username}"
     comments = reddit.user(username).comments(limit)
-    Thread.new { redis.set(username, ActiveSupport::JSON.encode(comments)) }
-    # TODO: Figure out setx
-    # Thread.new { redis.setx(username, seconds_to_cache, comments.to_json) }
+    Thread.new { 
+      redis.set(username, ActiveSupport::JSON.encode(comments))
+      if (!redis.expire(username, seconds_to_cache))
+        logger.error "Failed to set expiration on #{username}"
+      end
+    }
   end
   comments
 end

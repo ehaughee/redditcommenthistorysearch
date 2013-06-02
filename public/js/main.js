@@ -1,4 +1,6 @@
 $(document).ready(function() {
+	// Register pagination handlebars helper
+	Handlebars.registerHelper('paginate', paginate);
 
 	// Username existance check while typing
 	$("#search_username").keyup(function() {
@@ -34,7 +36,13 @@ $(document).ready(function() {
 			$.getJSON('/search/' + user.val() + '/' + encodeURIComponent(text.val()),
 				function(comments) {
 					var template = Handlebars.compile(commentTemplate);
-					$("#custom_search").after(template({ comments: comments }));
+					$("#search_results").html(template({
+						comments: comments,
+						pagination: {
+							page: 1,
+							pageCount: Math.ceil(comments.length/10) // TODO: Fix this magic number
+						}
+					}));
 					that.innerText = "Search";
 					that.className = that.className.replace(/\bdisabled\b/,'');
 				}
@@ -43,12 +51,31 @@ $(document).ready(function() {
 	});
 });
 
-var commentTemplate =
-	["{{#each comments}}",
+// ===========================================
+// ================ Templates ================
+// ===========================================
+var paginationTemplate = [
+	'<div class="pagination pagination-centered">',
+	'<ul>',
+	'{{#paginate pagination type="previous"}}',
+	'<li {{#if disabled}}class="disabled"{{/if}}><a href="#" data-pagenumber="{{n}}" data-pageoperation="prev" class="paginate_link" >Prev</a></li>',
+	'{{/paginate}}',
+	'{{#paginate pagination type="middle" limit="7"}}',
+	'<li {{#if active}}class="active"{{/if}}><a href="#" data-pagenumber="{{n}}" data-pageoperation="mid" class="paginate_link">{{n}}</a></li>',
+	'{{/paginate}}',
+	'{{#paginate pagination type="next"}}',
+	'<li {{#if disabled}}class="disabled"{{/if}}><a href="#" data-pagenumber="{{n}}" data-pageoperation="next" class="paginate_link">Next</a></li>',
+	'{{/paginate}}',
+	'</ul>',
+	'</div>'
+].join('\n');
+
+var commentTemplate = [
+	"{{#each comments}}",
 	"<div class='row panel'>",
 	"<div class='large-12 columns'>",
 	"{{body}}<br>{{author}}",
 	"</div>",
 	"</div>",
 	"{{/each}}"
-	].join('\n');
+].join('\n') + paginationTemplate;

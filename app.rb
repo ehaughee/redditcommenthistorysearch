@@ -17,6 +17,11 @@ if development?
   end
 end
 
+configure :production do
+  uri = URI.parse(ENV["REDISCLOUD_URL"])
+  REDIS = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
+end
+
 # require './lib/database'
 # require './lib/seed' if development?
 

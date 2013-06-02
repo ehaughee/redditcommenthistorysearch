@@ -36,20 +36,42 @@ $(document).ready(function() {
 			$.getJSON('/search/' + user.val() + '/' + encodeURIComponent(text.val()),
 				function(comments) {
 					var template = Handlebars.compile(commentTemplate);
-					$("#search_results").html(template({
-						comments: comments,
-						pagination: {
-							page: 1,
-							pageCount: Math.ceil(comments.length/10) // TODO: Fix this magic number
-						}
-					}));
+					$("#search_results").html(generateResultTemplate);
 					that.innerText = "Search";
 					that.className = that.className.replace(/\bdisabled\b/,'');
 				}
 			);
 		}
 	});
+
+	$(".paginate_link").click(function() {
+		var pageNum = this.dataset.pagenumber;
+
+		switch (this.dataset.pageoperation) {
+			case "prev":
+				if (pageNum > 1)
+
+				// go to previous
+				break;
+			case "mid":
+				// go to middle page
+				break;
+			case "next":
+				// go to next page
+				break;
+		}
+	});
 });
+
+function generateResultTemplate(comments, currentPage, itemsPerPage = 10) {
+	return  template({
+				comments: comments,
+				pagination: {
+					page: currentPage,
+					pageCount: Math.ceil(comments.length/itemsPerPage)
+				}
+			});
+}
 
 // ===========================================
 // ================ Templates ================

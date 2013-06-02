@@ -49,9 +49,9 @@ $(document).ready(function() {
 
 		switch (this.dataset.pageoperation) {
 			case "prev":
-				if (pageNum > 1)
-
-				// go to previous
+				if (pageNum > 1) {
+					// go to previous
+				}
 				break;
 			case "mid":
 				// go to middle page
@@ -63,7 +63,8 @@ $(document).ready(function() {
 	});
 });
 
-function generateResultTemplate(comments, currentPage, itemsPerPage = 10) {
+function generateResultTemplate(comments, currentPage, itemsPerPage) {
+	if (typeof itemsPerPage === "undefined") {	itemsPerPage = 10 }
 	return  template({
 				comments: comments,
 				pagination: {

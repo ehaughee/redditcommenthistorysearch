@@ -15,11 +15,17 @@ if development?
     use BetterErrors::Middleware
     BetterErrors.application_root = File.expand_path("..", __FILE__)
   end
+
+  def redis
+    redis ||= Redis.new(host: "localhost", port: 6379)
+  end
 end
 
-configure :production do
-  uri = URI.parse(ENV["REDISCLOUD_URL"])
-  REDIS = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
+if production?
+    def redis
+      uri = URI.parse(ENV["REDISCLOUD_URL"])
+      redis = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
+    end
 end
 
 # require './lib/database'
@@ -30,10 +36,6 @@ use Rack::Flash
 
 def reddit
   reddit ||= Snooby::Client.new
-end
-
-def redis
-  redis ||= Redis.new(host: "localhost", port: 6379)
 end
 
 seconds_to_cache = 1800

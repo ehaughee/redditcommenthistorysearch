@@ -1,13 +1,17 @@
+var _comments;
+
 $(document).ready(function() {
 	// Register pagination handlebars helper
 	Handlebars.registerHelper('paginate', paginate);
 
 	// Username existance check while typing
+	var elem = $("#search_user_check_display");
 	$("#search_username").keyup(function() {
+		// TODO: Debounce this
 		if (this.value.length > 2) {
-			var elem = $("#search_user_check_display");
-			elem.html("Working...");
+
 			// TODO: Show working gif
+			elem.html("Working...");
 
 			$.getJSON('/check_user/' + this.value, function(data) {
 				if (data.found === true) {
@@ -25,17 +29,33 @@ $(document).ready(function() {
 	});
 
 	// Search button for custom search was clicked
+	var text = $("#search_custom_text");
+	var user = $("#search_username");
+	var search_results = $("#search_results");
 	$("#search_custom_button").click(function() {
-		var text = $("#search_custom_text");
-		var user = $("#search_username");
 		if (text.val().length > 0 && user.val().length > 2) {
 			this.className += "disabled";
 			this.innerText = "Searching....";
 			var that = this;
 
 			$.getJSON('/search/' + user.val() + '/' + encodeURIComponent(text.val()),
-				function(comments) {
-					$("#search_results").html(generateResultTemplate(comments));
+				function(data) {
+					if (data.success) {
+						if (data.comments.length > 0) {
+							_comments = data.comments;
+							search_results.html(generateResultTemplate(data.comments));
+							registerPaginationClickEvent();
+						}
+						else {
+							// TODO: DOMify this
+							alert("No results found");
+						}
+					}
+					else {
+						// TODO: Display this error message on the DOM
+						alert("Error " + data.error);
+					}
+
 					that.innerText = "Search";
 					that.className = that.className.replace(/\bdisabled\b/,'');
 				}
@@ -43,33 +63,57 @@ $(document).ready(function() {
 		}
 	});
 
-	$(".paginate_link").click(function() {
-		var pageNum = this.dataset.pagenumber;
+	function registerPaginationClickEvent() {
+		$(".paginate_link").click(function() {
+			if (typeof _comments !== "undefined") {
+				var pageNum = this.dataset.pagenumber;
+				// switch(this.dataset.pageoperation) {
+					// case "prev":
+					// 	break;
 
-		switch (this.dataset.pageoperation) {
-			case "prev":
-				if (pageNum > 1) {
-					// go to previous
-				}
-				break;
-			case "mid":
-				// go to middle page
-				break;
-			case "next":
-				// go to next page
-				break;
-		}
-	});
+					// case "mid":
+						search_results.html(generateResultTemplate(_comments, pageNum));
+						// break;
+
+					// case "next";
+					// 	break;
+				// }
+				
+				registerPaginationClickEvent();
+			}
+			else {
+				console.log("No comments to paginate!");
+			}
+		});
+
+		// var activePageElem = $("li.active");
+		// activePageElem.html(activePageElem.children("a").text());
+
+		// var disabledPageElem = $("li.disabled");
+		// disabledPageElem.html(disabledPageElem.children("a").text());		
+	}
 
 	function generateResultTemplate(comments, currentPage, itemsPerPage) {
 		var template = Handlebars.compile(commentTemplate);
-		if (typeof itemsPerPage === "undefined") {	itemsPerPage = 10 }
-		if (typeof currentPage === "undefined") { currentPage = 1 }
+		if (typeof itemsPerPage === "undefined" || itemsPerPage < 1) { itemsPerPage = 3 }
+		if (typeof currentPage === "undefined" || currentPage < 1) { currentPage = 1 }
+
+
+		var pageCount = Math.ceil(comments.length/itemsPerPage);
+		var currentItem = ((currentPage * itemsPerPage) < comments.length) 
+							? (currentPage * itemsPerPage)
+							: comments.length;
+		
+		var begin = (currentItem - itemsPerPage >= 0) ? currentItem - itemsPerPage : 0;
+		var end = currentItem;
+		
+		comments = comments.slice(begin, end);
+
 		return template({
 					comments: comments,
 					pagination: {
 						page: currentPage,
-						pageCount: Math.ceil(comments.length/itemsPerPage)
+						pageCount: pageCount
 					}
 				});
 	}
@@ -82,13 +126,13 @@ var paginationTemplate = [
 	'<div class="pagination pagination-centered">',
 	'<ul>',
 	'{{#paginate pagination type="previous"}}',
-	'<li {{#if disabled}}class="disabled"{{/if}}><a href="#" data-pagenumber="{{n}}" data-pageoperation="prev" class="paginate_link" >Prev</a></li>',
+	'<li class="arrow{{#if disabled}} unavailable{{/if}}"><a href="#" data-pagenumber="{{n}}" data-pageoperation="prev" class="paginate_link" >Prev</a></li>',
 	'{{/paginate}}',
 	'{{#paginate pagination type="middle" limit="7"}}',
-	'<li {{#if active}}class="active"{{/if}}><a href="#" data-pagenumber="{{n}}" data-pageoperation="mid" class="paginate_link">{{n}}</a></li>',
+	'<li {{#if active}}class="current"{{/if}}><a href="#" data-pagenumber="{{n}}" data-pageoperation="mid" class="paginate_link">{{n}}</a></li>',
 	'{{/paginate}}',
 	'{{#paginate pagination type="next"}}',
-	'<li {{#if disabled}}class="disabled"{{/if}}><a href="#" data-pagenumber="{{n}}" data-pageoperation="next" class="paginate_link">Next</a></li>',
+	'<li class="arrow{{#if disabled}} unavailable{{/if}}"><a href="#" data-pagenumber="{{n}}" data-pageoperation="next" class="paginate_link">Next</a></li>',
 	'{{/paginate}}',
 	'</ul>',
 	'</div>'
@@ -103,3 +147,5 @@ var commentTemplate = [
 	"</div>",
 	"{{/each}}"
 ].join('\n') + paginationTemplate;
+
+

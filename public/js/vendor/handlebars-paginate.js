@@ -3,7 +3,7 @@ function paginate(pagination, options) {
   var type = options.hash.type || 'middle';
   var ret = '';
   var pageCount = pagination.pageCount;
-  var page = pagination.page;
+  var page = Number(pagination.page);
   var limit;
   if (options.hash.limit) limit = +options.hash.limit;
 

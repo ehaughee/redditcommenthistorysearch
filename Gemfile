@@ -9,12 +9,14 @@ gem "redis"
 gem "rack-flash3"
 gem "snooby" # Reddit API Wrapper
 gem "activesupport"
+gem "puma"
 
 group :development do
   # gem "dm-sqlite-adapter"
   # gem "sqlite3"
   gem "better_errors"
   gem "binding_of_caller"
+  gem "guard-puma"
 end
 
 # group :production do

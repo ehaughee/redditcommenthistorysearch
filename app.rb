@@ -65,8 +65,14 @@ end
 
 # TODO: Account for regex or normal for characters such as +
 get '/search/:username/:query' do |username, query|
+  if query.length < 2
+    {success: false, error: "Query too short.  Must be at least 3 characters."}.to_json
+  end
+
   if user_exists?(username)
-    get_comments_by_user(username).keep_if { |c| c["body"].match(query) }.to_json
+    { success: true, comments: get_comments_by_user(username).keep_if { |c| c["body"].match(query) }}.to_json
+  else
+    { success: false, error: "User not found" }.to_json
   end
 end
 
@@ -84,6 +90,7 @@ def get_comments_by_user(username, limit = 1000000000)
       end
     }
   end
+  logger.info "Comments: #{comments.count}"
   comments
 end
 

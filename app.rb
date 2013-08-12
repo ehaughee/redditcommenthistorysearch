@@ -93,7 +93,6 @@ def get_comments_by_user(username, limit = 1000000000)
     }
   end
   logger.info "Comments: #{comments.count}"
-  logger.info "COMMENT: #{comments[0]}"
   comments
 end
 

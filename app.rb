@@ -38,7 +38,7 @@ def reddit
   reddit ||= Snooby::Client.new
 end
 
-seconds_to_cache = 1800
+seconds_to_cache = 1800 # TODO: Move to config file
 
 helpers do
   def partial(page, options={}, locals={})
@@ -52,6 +52,8 @@ end
 
 # TODO: Should sanitize?
 get '/check_user/:username' do |username|
+  # TODO: Cache username for a day
+
   found = !reddit.user(username).about.nil?
   { found: found }.to_json
 end
@@ -91,6 +93,7 @@ def get_comments_by_user(username, limit = 1000000000)
     }
   end
   logger.info "Comments: #{comments.count}"
+  logger.info "COMMENT: #{comments[0]}"
   comments
 end
 

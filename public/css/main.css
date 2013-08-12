@@ -7,3 +7,11 @@
 	margin-bottom: 30px;
 	text-align: center;
 }
+
+.comment_links {
+	text-align: right;
+}
+
+#search_user_check_display {
+	margin-top: 1.5rem;
+}

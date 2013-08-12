@@ -11,7 +11,7 @@ $(document).ready(function() {
 		if (this.value.length > 2) {
 
 			// TODO: Show working gif
-			elem.html("Working...");
+			elem.html('<img src="/img/ajax-spinner.gif" />');
 
 			$.getJSON('/check_user/' + this.value, function(data) {
 				if (data.found === true) {
@@ -25,6 +25,9 @@ $(document).ready(function() {
 					elem.html("<b>!!</b>");
 				}
 			});
+		}
+		else {
+			elem.html("");
 		}
 	});
 
@@ -119,6 +122,15 @@ $(document).ready(function() {
 	}
 });
 
+Handlebars.registerHelper('split', function(text, splitter, which) {
+	var pieces = text.split(splitter);
+	which = parseInt(which);
+	if (typeof which !== "undefined" && which !== NaN && which < pieces.length) {
+		return pieces[which];
+	}
+	return pieces;
+});
+
 // ===========================================
 // ================ Templates ================
 // ===========================================
@@ -138,11 +150,23 @@ var paginationTemplate = [
 	'</div>'
 ].join('\n');
 
+// http://www.reddit.com/comments/{post id}/{slug}/{comment id}
 var commentTemplate = [
 	"{{#each comments}}",
-	"<div class='row panel'>",
-	"<div class='large-12 columns'>",
-	"{{body}}<br><br>- {{author}}",
+	"<div class='row panel comment_well'>",
+	"<div class='row'>",
+	"<div class='large-12 columns comment_body'>",
+	"{{body}}",
+	"</div>",
+	"</div>",
+	"<hr />",
+	"<div class='row comment_footer'>",
+	"<div class='large-8 columns comment_author'>",
+	"- {{author}}",
+	"</div>",
+	"<div class='large-4 columns comment_links'>",
+	"<a href='http://reddit.com/comments/{{split link_id \"_\" 1}}/_/{{id}}' target='_blank'>View on Reddit</a>",
+	"</div>",
 	"</div>",
 	"</div>",
 	"{{/each}}"

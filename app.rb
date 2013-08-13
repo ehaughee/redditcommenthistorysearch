@@ -74,7 +74,7 @@ get '/search/:username/:query' do |username, query|
   if user_exists?(username)
     { success: true, comments: get_comments_by_user(username).keep_if { |c| c["body"].match(query) }}.to_json
   else
-    { success: false, error: "User not found" }.to_json
+    { success: false, error: "User #{username} not found." }.to_json
   end
 end
 
@@ -85,12 +85,16 @@ def get_comments_by_user(username, limit = 1000000000)
   else
     logger.info "Cache miss on key: #{username}"
     comments = reddit.user(username).comments(limit)
-    Thread.new { 
-      redis.set(username, ActiveSupport::JSON.encode(comments))
-      if (!redis.expire(username, seconds_to_cache))
-        logger.error "Failed to set expiration on #{username}"
-      end
-    }
+    if (comments.count > 0)
+      Thread.new { 
+        redis.set(username, ActiveSupport::JSON.encode(comments))
+        if (!redis.expire(username, seconds_to_cache))
+          logger.error "Failed to set expiration on #{username}"
+        end
+      }
+    else
+      logger.info "No comments found for user."
+    end
   end
   comments
 end

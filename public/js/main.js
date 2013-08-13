@@ -35,7 +35,9 @@ $(document).ready(function() {
 	var text = $("#search_custom_text");
 	var user = $("#search_username");
 	var search_results = $("#search_results");
+	var search_results_alert = $("#search_results_alert");
 	$("#search_custom_button").click(function() {
+		search_results_alert.hide();
 		if (text.val().length > 0 && user.val().length > 2) {
 			this.className += "disabled";
 			this.innerText = "Searching....";
@@ -51,12 +53,15 @@ $(document).ready(function() {
 						}
 						else {
 							// TODO: DOMify this
-							alert("No results found");
+							search_results_alert.prepend("No results found");
+							search_results_alert.show();
 						}
 					}
 					else {
 						// TODO: Display this error message on the DOM
-						alert("Error " + data.error);
+						search_results_alert.prepend("Error: " + data.error);
+						search_results_alert.addClass("alert");
+						search_results_alert.show();
 					}
 
 					that.innerText = "Search";
@@ -123,6 +128,10 @@ $(document).ready(function() {
 });
 
 Handlebars.registerHelper('split', function(text, splitter, which) {
+	if (typeof text === "undefined") {
+		return "";
+	}
+
 	var pieces = text.split(splitter);
 	which = parseInt(which);
 	if (typeof which !== "undefined" && which !== NaN && which < pieces.length) {

@@ -15,3 +15,9 @@
 #search_user_check_display {
 	margin-top: 1.5rem;
 }
+
+#search_results_alert {
+	width: 70%;
+	margin: 0 auto;
+	display: none;
+}

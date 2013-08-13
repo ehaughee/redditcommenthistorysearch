@@ -68,7 +68,7 @@ end
 # TODO: Account for regex or normal for characters such as +
 get '/search/:username/:query' do |username, query|
   if query.length < 2
-    {success: false, error: "Query too short.  Must be at least 3 characters."}.to_json
+    { success: false, error: "Query too short.  Must be at least 3 characters." }.to_json
   end
 
   if user_exists?(username)
@@ -92,12 +92,11 @@ def get_comments_by_user(username, limit = 1000000000)
       end
     }
   end
-  logger.info "Comments: #{comments.count}"
   comments
 end
 
 def cache_hit?(key)
-  !redis.get(key).nil?
+  redis.exists(key)
 end
 
 def user_exists?(username)

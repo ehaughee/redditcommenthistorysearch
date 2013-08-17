@@ -38,7 +38,8 @@ def reddit
   reddit ||= Snooby::Client.new
 end
 
-seconds_to_cache = 1800 # TODO: Move to config file
+CACHE_COMMENTS_SECONDS = 1800 # 30 minutes TODO: Move to config file
+CACHE_UNAME_CHECK_SECONDS = 86400 # 1 day
 
 helpers do
   def partial(page, options={}, locals={})
@@ -52,9 +53,23 @@ end
 
 # TODO: Should sanitize?
 get '/check_user/:username' do |username|
-  # TODO: Cache username for a day
+  key = "unamecheck-" + username
 
-  found = !reddit.user(username).about.nil?
+  if (cache_hit?(key))
+    logger.info "Cache hit on key: #{key}"
+    found = redis.get(key) == "true";
+  else
+    logger.info "Cache miss on key: #{key}"
+    found = !reddit.user(username).about.nil?
+  end
+
+  Thread.new {
+    redis.set(key, found)
+    if (!redis.expire(key, CACHE_UNAME_CHECK_SECONDS))
+      logger.error "Failed to set expiration on #{key}" # TODO: this won't get hit
+    end
+  }
+
   { found: found }.to_json
 end
 
@@ -69,12 +84,10 @@ end
 get '/search/:username/:query' do |username, query|
   if query.length < 2
     { success: false, error: "Query too short.  Must be at least 3 characters." }.to_json
-  end
-
-  if user_exists?(username)
-    { success: true, comments: get_comments_by_user(username).keep_if { |c| c["body"].match(query) }}.to_json
+  elsif not user_exists?(username)
+    { success: false, error: "User #{username} not found" }.to_json
   else
-    { success: false, error: "User #{username} not found." }.to_json
+    { success: true, comments: get_comments_by_user(username).keep_if { |c| c["body"].match(query) }}.to_json
   end
 end
 
@@ -86,14 +99,19 @@ def get_comments_by_user(username, limit = 1000000000)
     logger.info "Cache miss on key: #{username}"
     comments = reddit.user(username).comments(limit)
     if (comments.count > 0)
-      Thread.new { 
-        redis.set(username, ActiveSupport::JSON.encode(comments))
-        if (!redis.expire(username, seconds_to_cache))
-          logger.error "Failed to set expiration on #{username}"
+      comments_to_cache = comments.clone
+      Thread.new {
+        begin
+          redis.set(username, ActiveSupport::JSON.encode(comments_to_cache))
+          if (!redis.expire(username, CACHE_COMMENTS_SECONDS)) # TODO: Abstract this out
+            logger.error "Failed to set expiration on #{username}" # TODO: this won't get hit
+          end
+        ensure  
+          logger.info "Stored #{comments_to_cache.count} comments"
         end
       }
     else
-      logger.info "No comments found for user."
+      logger.info "No comments found for user"
     end
   end
   comments

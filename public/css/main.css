@@ -21,3 +21,11 @@
 	margin: 0 auto;
 	display: none;
 }
+
+#search_custom_button {
+	float: left;
+}
+
+#search_custom_clear_button {
+	float: right;
+}

@@ -36,6 +36,7 @@ $(document).ready(function() {
 	var user = $("#search_username");
 	var search_results = $("#search_results");
 	var search_results_alert = $("#search_results_alert");
+
 	$("#search_custom_button").click(function() {
 		search_results_alert.hide();
 		if (text.val().length > 0 && user.val().length > 2) {
@@ -52,16 +53,12 @@ $(document).ready(function() {
 							registerPaginationClickEvent();
 						}
 						else {
-							// TODO: DOMify this
-							search_results_alert.prepend("No results found");
-							search_results_alert.show();
+
+							displayAlert("No results found");
 						}
 					}
 					else {
-						// TODO: Display this error message on the DOM
-						search_results_alert.prepend("Error: " + data.error);
-						search_results_alert.addClass("alert");
-						search_results_alert.show();
+						displayAlert("<b>Error: </b>" + data.error, "error");
 					}
 
 					that.innerText = "Search";
@@ -71,22 +68,30 @@ $(document).ready(function() {
 		}
 	});
 
+	$("#search_custom_clear_button").click(function () {
+		if (search_results.children().length > 0) {
+			search_results.empty();
+		}
+	});
+
+	function displayAlert(msg, type) {
+		if (msg !== "") {
+			var message = search_results_alert.children("span.message");
+			message.text(msg);
+
+			if (type === "error") {
+				search_results_alert.addClass("alert");
+			}
+
+			search_results_alert.show();
+		}
+	}
+
 	function registerPaginationClickEvent() {
 		$(".paginate_link").click(function() {
 			if (typeof _comments !== "undefined") {
 				var pageNum = this.dataset.pagenumber;
-				// switch(this.dataset.pageoperation) {
-					// case "prev":
-					// 	break;
-
-					// case "mid":
-						search_results.html(generateResultTemplate(_comments, pageNum));
-						// break;
-
-					// case "next";
-					// 	break;
-				// }
-				
+				search_results.html(generateResultTemplate(_comments, pageNum));
 				registerPaginationClickEvent();
 			}
 			else {

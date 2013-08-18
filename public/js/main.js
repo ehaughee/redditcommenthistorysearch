@@ -5,29 +5,32 @@ $(document).ready(function() {
 	Handlebars.registerHelper('paginate', paginate);
 
 	// Username existance check while typing
-	var elem = $("#search_user_check_display");
+	var search_user_check_display = $("#search_user_check_display > span");
 	$("#search_username").keyup(function() {
 		// TODO: Debounce this
 		if (this.value.length > 2) {
 
 			// TODO: Show working gif
-			elem.html('<img src="/img/ajax-spinner.gif" />');
+			search_user_check_display.html('<img src="/img/ajax-spinner.gif" />');
+			search_user_check_display.attr("class", "label round secondary");
 
-			$.getJSON('/check_user/' + this.value, function(data) {
+			$.getJSON('/check_user/' + encodeURIComponent(this.value), function(data) {
 				if (data.found === true) {
-					// TODO: Display checkmark
-					elem.html("<b>&#x2714;</b>");
+					search_user_check_display.html("<b>&#x2714;</b>");
+					search_user_check_display.attr("class", "label round success");
 				} else if (data.found === false) {
-					// TODO: Display X
-					elem.html("<b>&#x2718;</b>");
+					search_user_check_display.html("<b>&#x2718;</b>");
+					search_user_check_display.attr("class", "label round alert");
 				} else {
 					// Display nothing/error
-					elem.html("<b>!!</b>");
+					search_user_check_display.html("<b>Err</b>");
+					search_user_check_display.attr("class", "label round alert");
 				}
 			});
 		}
 		else {
-			elem.html("");
+			search_user_check_display.html("?");
+			search_user_check_display.attr("class", "label round secondary");
 		}
 	});
 

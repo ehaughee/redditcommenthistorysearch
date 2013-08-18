@@ -1,20 +1,5 @@
 %h3.page_title Reddit Comment History Search
-#username.row.panel.radius
-  .large-11.columns
-    %label 1. Type a username
-    %input{id: "search_username", placeholder: "Username", type: "text"}
-  #search_user_check_display.large-1.columns
-#custom_search.row.panel.radius
-  .large-12.columns
-    %label 2. Custom Search
-    %input#search_custom_text{placeholder: "i.e. Address", type: "text"}
-  .large-12.columns
-    %button#search_custom_button.small-8.button.radius Search
-    %button#search_custom_clear_button.small-3.radius.alert Clear
-#search_results
-  #search_results_alert.alert-box.radius{"data-alert" => ""}
-    %span.message
-    %a.close{:href => "#"} &times;
+= partial(:'partials/comment_search')
 
 / .row.panel.radius
 /   .large-12.columns

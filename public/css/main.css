@@ -1,3 +1,4 @@
+/* TODO: Change to ems */
 .content {
 	padding: 10px;
 }
@@ -13,7 +14,7 @@
 }
 
 #search_user_check_display {
-	margin-top: 1.5rem;
+	margin-top: 1.8rem;
 }
 
 #search_results_alert {
@@ -28,4 +29,9 @@
 
 #search_custom_clear_button {
 	float: right;
+}
+
+.search_label {
+	font-size: 18px;
+	margin-bottom: 5px;
 }

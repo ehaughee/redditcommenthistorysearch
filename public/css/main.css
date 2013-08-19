@@ -35,3 +35,13 @@
 	font-size: 18px;
 	margin-bottom: 5px;
 }
+
+.loading_bar {
+  display: block;
+  margin: 0 auto;
+}
+
+.pagination {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}

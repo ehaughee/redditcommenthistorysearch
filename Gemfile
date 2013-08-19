@@ -11,6 +11,7 @@ gem "redis"
 gem "rack-flash3"
 gem "snooby" # Reddit API Wrapper
 gem "activesupport"
+gem "coffee-script"
 gem "puma"
 
 group :development do
@@ -18,6 +19,9 @@ group :development do
   # gem "sqlite3"
   gem "better_errors"
   gem "binding_of_caller"
+  gem "guard-puma"
+  gem "guard-coffeescript"
+  gem "therubyracer"
 end
 
 # group :production do

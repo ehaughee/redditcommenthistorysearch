@@ -6,3 +6,5 @@ guard 'puma', port: 4567 do
   watch(%r{^config|lib|api/.*})
   watch('app.rb')
 end
+
+guard 'coffeescript', :input => 'public/js', source_map: true, source_root: ""

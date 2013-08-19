@@ -6,7 +6,5 @@
   .large-12.columns
     %button#search_custom_button.small-8.button.radius Search
     %button#search_custom_clear_button.small-3.radius.alert Clear
+= partial(:'partials/alert')
 #search_results
-  #search_results_alert.alert-box.radius{"data-alert" => ""}
-    %span.message
-    %a.close{:href => "#"} &times;

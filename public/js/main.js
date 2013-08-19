@@ -1,192 +1,167 @@
-var _comments;
+(function() {
+  var commentTemplate, displayAlert, generateResultTemplate, paginationTemplate, query, registerPaginationClickEvent, search_custom_button, search_results, search_results_alert, search_user_check_display, username, _comments;
 
-$(document).ready(function() {
-	// Register pagination handlebars helper
-	Handlebars.registerHelper('paginate', paginate);
+  _comments = void 0;
 
-	// Username existance check while typing
-	var search_user_check_display = $("#search_user_check_display > span");
-	$("#search_username").keyup(function() {
-		// TODO: Debounce this
-		if (this.value.length > 2) {
+  query = void 0;
 
-			// TODO: Show working gif
-			search_user_check_display.html('<img src="/img/ajax-spinner.gif" />');
-			search_user_check_display.attr("class", "label round secondary");
+  username = void 0;
 
-			$.getJSON('/check_user/' + encodeURIComponent(this.value), function(data) {
-				if (data.found === true) {
-					search_user_check_display.html("<b>&#x2714;</b>");
-					search_user_check_display.attr("class", "label round success");
-				} else if (data.found === false) {
-					search_user_check_display.html("<b>&#x2718;</b>");
-					search_user_check_display.attr("class", "label round alert");
-				} else {
-					// Display nothing/error
-					search_user_check_display.html("<b>Err</b>");
-					search_user_check_display.attr("class", "label round alert");
-				}
-			});
-		}
-		else {
-			search_user_check_display.html("?");
-			search_user_check_display.attr("class", "label round secondary");
-		}
-	});
+  search_results = void 0;
 
-	// Search button for custom search was clicked
-	var text = $("#search_custom_text");
-	var user = $("#search_username");
-	var search_results = $("#search_results");
-	var search_results_alert = $("#search_results_alert");
+  search_results_alert = void 0;
 
-	$("#search_custom_button").click(function() {
-		search_results_alert.hide();
-		if (text.val().length > 0 && user.val().length > 2) {
-			this.className += "disabled";
-			this.innerText = "Searching....";
-			var that = this;
+  search_user_check_display = void 0;
 
-			$.getJSON('/search/' + user.val() + '/' + encodeURIComponent(text.val()),
-				function(data) {
-					if (data.success) {
-						if (data.comments.length > 0) {
-							_comments = data.comments;
-							search_results.html(generateResultTemplate(data.comments));
-							registerPaginationClickEvent();
-						}
-						else {
+  search_custom_button = void 0;
 
-							displayAlert("No results found");
-						}
-					}
-					else {
-						displayAlert("<b>Error: </b>" + data.error, "error");
-					}
+  $(document).ready(function() {
+    Handlebars.registerHelper('paginate', paginate);
+    query = $("#search_custom_text");
+    username = $("#search_username");
+    search_results = $("#search_results");
+    search_results_alert = $("#search_results_alert");
+    search_user_check_display = $("#search_user_check_display > span");
+    search_custom_button = $("#search_custom_button");
+    $("#search_username").keyup(function() {
+      var classes, html;
+      html = "";
+      classes = "";
+      if (this.value.length > 2) {
+        html = "<img src=\"/img/ajax-spinner.gif\" />";
+        classes = "label round secondary";
+        $.getJSON("/check_user/" + (encodeURIComponent(this.value)), function(data) {
+          if (data.found === true) {
+            html = "<b>&#x2714;</b>";
+            classes = "label round success";
+          } else if (data.found === false) {
+            html = "<b>&#x2714;</b>";
+            classes = "label round success";
+          } else {
+            html = "<b>Err</b>";
+            classes = "label round secondary";
+          }
+          search_user_check_display.html(html);
+          return search_user_check_display.attr("class", classes);
+        });
+      } else {
+        html = "?";
+        classes = "lable round secondary";
+      }
+      search_user_check_display.html(html);
+      return search_user_check_display.attr("class", classes);
+    });
+    query.keyup(function(e) {
+      if (e.keyCode === 13) {
+        return search_custom_button.click.apply(search_custom_button);
+      }
+    });
+    search_custom_button.click(function() {
+      var that;
+      if (search_results_alert.is(":visible")) {
+        search_results_alert.hide();
+      }
+      if (query.val().length > 0 && username.val().length > 2) {
+        this.className += "disabled";
+        this.innerText = "Searching...";
+        search_results.html("<img class=\"loading_bar\" src=\"img/loading-bar.gif\" />");
+        that = $(this);
+        return $.getJSON("/search/" + (encodeURIComponent(username.val())) + "/" + (encodeURIComponent(query.val())), function(data) {
+          if (data.success) {
+            if (data.comments.length > 0) {
+              _comments = data.comments;
+              search_results.html(generateResultTemplate(data.comments));
+              registerPaginationClickEvent();
+            } else {
+              search_results.html("");
+              displayAlert("No results found");
+            }
+          } else {
+            search_results.html("");
+            displayAlert("<b>Error:</b>" + data.error, "alert");
+          }
+          that.text("Search");
+          return that.removeClass("disabled");
+        });
+      }
+    });
+    username.focus();
+    return $("#search_custom_clear_button").click(function() {
+      if (search_results.children().length > 0) {
+        search_results.empty();
+      }
+      query.focus();
+      return query.select();
+    });
+  });
 
-					that.innerText = "Search";
-					that.className = that.className.replace(/\bdisabled\b/,'');
-				}
-			);
-		}
-	});
+  displayAlert = function(msg, type) {
+    var message;
+    if (msg != null) {
+      message = search_results_alert.children("span.message");
+      message.text(msg);
+      if (type != null) {
+        search_user_alert.addClass(type);
+      }
+      return search_results_alert.show();
+    }
+  };
 
-	$("#search_custom_clear_button").click(function () {
-		if (search_results.children().length > 0) {
-			search_results.empty();
-		}
-	});
+  registerPaginationClickEvent = function() {
+    return $(".paginate_link").click(function() {
+      var pageNum;
+      if (_comments != null) {
+        pageNum = this.dataset.pagenumber;
+        search_results.html(generateResultTemplate(_comments, pageNum));
+        return registerPaginationClickEvent();
+      } else {
+        return console.log("No comments to paginate!");
+      }
+    });
+  };
 
-	function displayAlert(msg, type) {
-		if (msg !== "") {
-			var message = search_results_alert.children("span.message");
-			message.text(msg);
+  generateResultTemplate = function(comments, currentPage, itemsPerPage) {
+    var begin, currentItem, end, pageCount, template;
+    template = Handlebars.compile(commentTemplate);
+    if ((itemsPerPage == null) || itemsPerPage < 1) {
+      itemsPerPage = 3;
+    }
+    if ((currentPage == null) || currentPage < 1) {
+      currentPage = 1;
+    }
+    pageCount = Math.ceil(comments.length / itemsPerPage);
+    currentItem = (currentPage * itemsPerPage) < comments.length ? currentPage * itemsPerPage : comments.length;
+    begin = currentItem - itemsPerPage >= 0 ? currentItem - itemsPerPage : 0;
+    end = currentItem;
+    comments = comments.slice(begin, end);
+    return template({
+      comments: comments,
+      pagination: {
+        page: currentPage,
+        pageCount: pageCount
+      }
+    });
+  };
 
-			if (type === "error") {
-				search_results_alert.addClass("alert");
-			}
+  Handlebars.registerHelper('split', function(text, splitter, which) {
+    var pieces;
+    if (text == null) {
+      return "";
+    }
+    pieces = text.split(splitter);
+    which = parseInt(which);
+    if ((which != null) && ((-1 < which && which < pieces.length))) {
+      return pieces[which];
+    }
+    return pieces;
+  });
 
-			search_results_alert.show();
-		}
-	}
+  paginationTemplate = "<div class=\"pagination pagination-centered\">\n  <ul>\n    {{#paginate pagination type=\"previous\"}}\n      <li class=\"arrow{{#if disabled}} unavailable{{/if}}\">\n        <a href=\"#\" data-pagenumber=\"{{n}}\" data-pageoperation=\"prev\" class=\"paginate_link\" >Prev</a>\n      </li>\n    {{/paginate}}\n    {{#paginate pagination type=\"middle\" limit=\"7\"}}\n      <li {{#if active}}class=\"current\"{{/if}}>\n        <a href=\"#\" data-pagenumber=\"{{n}}\" data-pageoperation=\"mid\" class=\"paginate_link\">{{n}}</a>\n      </li>\n    {{/paginate}}\n    {{#paginate pagination type=\"next\"}}\n      <li class=\"arrow{{#if disabled}} unavailable{{/if}}\">\n        <a href=\"#\" data-pagenumber=\"{{n}}\" data-pageoperation=\"next\" class=\"paginate_link\">Next</a>\n      </li>\n    {{/paginate}}\n  </ul>\n</div>";
 
-	function registerPaginationClickEvent() {
-		$(".paginate_link").click(function() {
-			if (typeof _comments !== "undefined") {
-				var pageNum = this.dataset.pagenumber;
-				search_results.html(generateResultTemplate(_comments, pageNum));
-				registerPaginationClickEvent();
-			}
-			else {
-				console.log("No comments to paginate!");
-			}
-		});
+  commentTemplate = paginationTemplate + "{{#each comments}}\n  <div class='row panel comment_well'>\n    <div class='row'>\n      <div class='large-12 columns comment_body'>\n        {{body}}\n      </div>\n    </div>\n    <hr />\n    <div class='row comment_footer'>\n        <div class='large-8 columns comment_author'>\n          - {{author}}\n        </div>\n        <div class='large-4 columns comment_links'>\n          <a href='http://reddit.com/comments/{{split link_id \"_\" 1}}/_/{{id}}' target='_blank'>View on Reddit</a>\n        </div>\n    </div>\n  </div>\n{{/each}}" + paginationTemplate;
 
-		// var activePageElem = $("li.active");
-		// activePageElem.html(activePageElem.children("a").text());
+}).call(this);
 
-		// var disabledPageElem = $("li.disabled");
-		// disabledPageElem.html(disabledPageElem.children("a").text());		
-	}
-
-	function generateResultTemplate(comments, currentPage, itemsPerPage) {
-		var template = Handlebars.compile(commentTemplate);
-		if (typeof itemsPerPage === "undefined" || itemsPerPage < 1) { itemsPerPage = 3 }
-		if (typeof currentPage === "undefined" || currentPage < 1) { currentPage = 1 }
-
-
-		var pageCount = Math.ceil(comments.length/itemsPerPage);
-		var currentItem = ((currentPage * itemsPerPage) < comments.length) 
-							? (currentPage * itemsPerPage)
-							: comments.length;
-		
-		var begin = (currentItem - itemsPerPage >= 0) ? currentItem - itemsPerPage : 0;
-		var end = currentItem;
-		
-		comments = comments.slice(begin, end);
-
-		return template({
-					comments: comments,
-					pagination: {
-						page: currentPage,
-						pageCount: pageCount
-					}
-				});
-	}
-});
-
-Handlebars.registerHelper('split', function(text, splitter, which) {
-	if (typeof text === "undefined") {
-		return "";
-	}
-
-	var pieces = text.split(splitter);
-	which = parseInt(which);
-	if (typeof which !== "undefined" && which !== NaN && which < pieces.length) {
-		return pieces[which];
-	}
-	return pieces;
-});
-
-// ===========================================
-// ================ Templates ================
-// ===========================================
-var paginationTemplate = [
-	'<div class="pagination pagination-centered">',
-	'<ul>',
-	'{{#paginate pagination type="previous"}}',
-	'<li class="arrow{{#if disabled}} unavailable{{/if}}"><a href="#" data-pagenumber="{{n}}" data-pageoperation="prev" class="paginate_link" >Prev</a></li>',
-	'{{/paginate}}',
-	'{{#paginate pagination type="middle" limit="7"}}',
-	'<li {{#if active}}class="current"{{/if}}><a href="#" data-pagenumber="{{n}}" data-pageoperation="mid" class="paginate_link">{{n}}</a></li>',
-	'{{/paginate}}',
-	'{{#paginate pagination type="next"}}',
-	'<li class="arrow{{#if disabled}} unavailable{{/if}}"><a href="#" data-pagenumber="{{n}}" data-pageoperation="next" class="paginate_link">Next</a></li>',
-	'{{/paginate}}',
-	'</ul>',
-	'</div>'
-].join('\n');
-
-// http://www.reddit.com/comments/{post id}/{slug}/{comment id}
-var commentTemplate = [
-	"{{#each comments}}",
-	"<div class='row panel comment_well'>",
-	"<div class='row'>",
-	"<div class='large-12 columns comment_body'>",
-	"{{body}}",
-	"</div>",
-	"</div>",
-	"<hr />",
-	"<div class='row comment_footer'>",
-	"<div class='large-8 columns comment_author'>",
-	"- {{author}}",
-	"</div>",
-	"<div class='large-4 columns comment_links'>",
-	"<a href='http://reddit.com/comments/{{split link_id \"_\" 1}}/_/{{id}}' target='_blank'>View on Reddit</a>",
-	"</div>",
-	"</div>",
-	"</div>",
-	"{{/each}}"
-].join('\n') + paginationTemplate;
-
-
+/*
+//@ sourceMappingURL=main.js.map
+*/

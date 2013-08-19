@@ -9,7 +9,6 @@ require 'rack-flash'
 require 'active_support'
 
 if development?
-  require 'sinatra/reloader'
   require 'better_errors'
   configure :development do
     use BetterErrors::Middleware
@@ -107,7 +106,7 @@ def get_comments_by_user(username, limit = 1000000000)
             logger.error "Failed to set expiration on #{username}" # TODO: this won't get hit
           end
         ensure  
-          logger.info "Stored #{comments_to_cache.count} comments"
+          logger.info "Stored #{comments_to_cache.count} comment(s)"
         end
       }
     else

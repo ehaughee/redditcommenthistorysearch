@@ -51,14 +51,14 @@ $(document).ready ->
       search_custom_button.click.apply(search_custom_button)
 
   search_custom_button.click ->
+
     if search_results_alert.is(":visible")
       search_results_alert.hide()
 
-    if query.val().length > 0 and username.val().length > 2
-      @className += "disabled"
-      @innerText = "Searching..."
+    if query.val().length > 0 and username.val().length > 2v
+      search_custom_button.addClass "disabled"
+      search_custom_button.text "Searching..."
       search_results.html "<img class=\"loading_bar\" src=\"img/loading-bar.gif\" />"
-      that = $(this)
 
       $.getJSON "/search/#{encodeURIComponent(username.val())}/#{encodeURIComponent(query.val())}",
         (data) ->
@@ -74,8 +74,8 @@ $(document).ready ->
             search_results.html ""
             displayAlert "<b>Error:</b>#{data.error}", "alert"
 
-          that.text "Search"
-          that.removeClass "disabled"
+          search_custom_button.text "Search"
+          search_custom_button.removeClass "disabled"
   username.focus()
 
   $("#search_custom_clear_button").click ->

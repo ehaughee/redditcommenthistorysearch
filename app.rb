@@ -81,11 +81,19 @@ end
 
 # TODO: Account for regex or normal for characters such as +
 get '/search/:username/:query' do |username, query|
+  logger.info "QUERY: #{query}"
   if query.length < 2
     { success: false, error: "Query too short.  Must be at least 3 characters." }.to_json
   elsif not user_exists?(username)
     { success: false, error: "User #{username} not found" }.to_json
   else
+    # Validate Regex
+    begin
+      query = Regexp.new(query)
+    rescue RegexpError => ex
+      return { success: false, error: "#{ex.message}"}.to_json
+    end
+
     { success: true, comments: get_comments_by_user(username).keep_if { |c| c["body"].match(query) }}.to_json
   end
 end

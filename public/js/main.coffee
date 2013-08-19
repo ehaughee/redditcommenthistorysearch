@@ -55,7 +55,7 @@ $(document).ready ->
     if search_results_alert.is(":visible")
       search_results_alert.hide()
 
-    if query.val().length > 0 and username.val().length > 2v
+    if query.val().length > 0 and username.val().length > 2
       search_custom_button.addClass "disabled"
       search_custom_button.text "Searching..."
       search_results.html "<img class=\"loading_bar\" src=\"img/loading-bar.gif\" />"
@@ -72,7 +72,7 @@ $(document).ready ->
               displayAlert "No results found"
           else
             search_results.html ""
-            displayAlert "<b>Error:</b>#{data.error}", "alert"
+            displayAlert "<b>Error:</b> #{data.error}", "alert"
 
           search_custom_button.text "Search"
           search_custom_button.removeClass "disabled"
@@ -86,10 +86,10 @@ $(document).ready ->
 displayAlert = (msg, type) ->
   if msg?
     message = search_results_alert.children("span.message")
-    message.text(msg)
+    message.html(msg)
 
     if type?
-      search_user_alert.addClass(type)
+      search_results_alert.addClass(type)
 
     search_results_alert.show()
 
@@ -161,12 +161,12 @@ paginationTemplate = """
         <li class="arrow{{#if disabled}} unavailable{{/if}}">
           <a href="#" data-pagenumber="{{n}}" data-pageoperation="next" class="paginate_link">Next</a>
         </li>
-      {{/paginate}}
+      {{/paginate}} 
     </ul>
   </div>
 """
 
-commentTemplate = paginationTemplate + 
+commentTemplate = paginationTemplate +
 """
   {{#each comments}}
     <div class='row panel comment_well'>

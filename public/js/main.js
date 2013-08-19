@@ -57,15 +57,13 @@
       }
     });
     search_custom_button.click(function() {
-      var that;
       if (search_results_alert.is(":visible")) {
         search_results_alert.hide();
       }
       if (query.val().length > 0 && username.val().length > 2) {
-        this.className += "disabled";
-        this.innerText = "Searching...";
+        search_custom_button.addClass("disabled");
+        search_custom_button.text("Searching...");
         search_results.html("<img class=\"loading_bar\" src=\"img/loading-bar.gif\" />");
-        that = $(this);
         return $.getJSON("/search/" + (encodeURIComponent(username.val())) + "/" + (encodeURIComponent(query.val())), function(data) {
           if (data.success) {
             if (data.comments.length > 0) {
@@ -78,10 +76,10 @@
             }
           } else {
             search_results.html("");
-            displayAlert("<b>Error:</b>" + data.error, "alert");
+            displayAlert("<b>Error:</b> " + data.error, "alert");
           }
-          that.text("Search");
-          return that.removeClass("disabled");
+          search_custom_button.text("Search");
+          return search_custom_button.removeClass("disabled");
         });
       }
     });
@@ -99,9 +97,9 @@
     var message;
     if (msg != null) {
       message = search_results_alert.children("span.message");
-      message.text(msg);
+      message.html(msg);
       if (type != null) {
-        search_user_alert.addClass(type);
+        search_results_alert.addClass(type);
       }
       return search_results_alert.show();
     }
@@ -156,7 +154,7 @@
     return pieces;
   });
 
-  paginationTemplate = "<div class=\"pagination pagination-centered\">\n  <ul>\n    {{#paginate pagination type=\"previous\"}}\n      <li class=\"arrow{{#if disabled}} unavailable{{/if}}\">\n        <a href=\"#\" data-pagenumber=\"{{n}}\" data-pageoperation=\"prev\" class=\"paginate_link\" >Prev</a>\n      </li>\n    {{/paginate}}\n    {{#paginate pagination type=\"middle\" limit=\"7\"}}\n      <li {{#if active}}class=\"current\"{{/if}}>\n        <a href=\"#\" data-pagenumber=\"{{n}}\" data-pageoperation=\"mid\" class=\"paginate_link\">{{n}}</a>\n      </li>\n    {{/paginate}}\n    {{#paginate pagination type=\"next\"}}\n      <li class=\"arrow{{#if disabled}} unavailable{{/if}}\">\n        <a href=\"#\" data-pagenumber=\"{{n}}\" data-pageoperation=\"next\" class=\"paginate_link\">Next</a>\n      </li>\n    {{/paginate}}\n  </ul>\n</div>";
+  paginationTemplate = "<div class=\"pagination pagination-centered\">\n  <ul>\n    {{#paginate pagination type=\"previous\"}}\n      <li class=\"arrow{{#if disabled}} unavailable{{/if}}\">\n        <a href=\"#\" data-pagenumber=\"{{n}}\" data-pageoperation=\"prev\" class=\"paginate_link\" >Prev</a>\n      </li>\n    {{/paginate}}\n    {{#paginate pagination type=\"middle\" limit=\"7\"}}\n      <li {{#if active}}class=\"current\"{{/if}}>\n        <a href=\"#\" data-pagenumber=\"{{n}}\" data-pageoperation=\"mid\" class=\"paginate_link\">{{n}}</a>\n      </li>\n    {{/paginate}}\n    {{#paginate pagination type=\"next\"}}\n      <li class=\"arrow{{#if disabled}} unavailable{{/if}}\">\n        <a href=\"#\" data-pagenumber=\"{{n}}\" data-pageoperation=\"next\" class=\"paginate_link\">Next</a>\n      </li>\n    {{/paginate}} \n  </ul>\n</div>";
 
   commentTemplate = paginationTemplate + "{{#each comments}}\n  <div class='row panel comment_well'>\n    <div class='row'>\n      <div class='large-12 columns comment_body'>\n        {{body}}\n      </div>\n    </div>\n    <hr />\n    <div class='row comment_footer'>\n        <div class='large-8 columns comment_author'>\n          - {{author}}\n        </div>\n        <div class='large-4 columns comment_links'>\n          <a href='http://reddit.com/comments/{{split link_id \"_\" 1}}/_/{{id}}' target='_blank'>View on Reddit</a>\n        </div>\n    </div>\n  </div>\n{{/each}}" + paginationTemplate;
 

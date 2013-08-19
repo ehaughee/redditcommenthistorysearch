@@ -45,7 +45,7 @@
           return search_user_check_display.attr("class", classes);
         });
       } else {
-        html = "?";
+        html = "<b>?</b>";
         classes = "lable round secondary";
       }
       search_user_check_display.html(html);

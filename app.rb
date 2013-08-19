@@ -81,7 +81,6 @@ end
 
 # TODO: Account for regex or normal for characters such as +
 get '/search/:username/:query' do |username, query|
-  logger.info "QUERY: #{query}"
   if query.length < 2
     { success: false, error: "Query too short.  Must be at least 3 characters." }.to_json
   elsif not user_exists?(username)

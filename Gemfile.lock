@@ -36,6 +36,8 @@ GEM
       libnotify
       puma
       rb-inotify
+    guard-shell (0.5.1)
+      guard (>= 1.1.0)
     haml (4.0.3)
       tilt
     i18n (0.6.1)
@@ -51,6 +53,7 @@ GEM
     method_source (0.8.2)
     multi_json (1.7.4)
     net-http-persistent (2.8)
+    newrelic_rpm (3.6.6.147)
     pry (0.9.12.2)
       coderay (~> 1.0.5)
       method_source (~> 0.8)
@@ -103,8 +106,10 @@ DEPENDENCIES
   coffee-script
   guard-coffeescript
   guard-puma
+  guard-shell
   haml
   json
+  newrelic_rpm
   puma
   rack-flash3
   redis

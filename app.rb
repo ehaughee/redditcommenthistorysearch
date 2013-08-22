@@ -1,6 +1,8 @@
 require 'sinatra'
 require 'sinatra/json'
 
+require 'newrelic_rpm'
+
 require 'haml'
 require 'json'
 require 'redis'

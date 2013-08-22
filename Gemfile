@@ -13,6 +13,7 @@ gem "snooby" # Reddit API Wrapper
 gem "activesupport"
 gem "coffee-script"
 gem "puma"
+gem "newrelic_rpm"
 
 group :development do
   # gem "dm-sqlite-adapter"
@@ -21,6 +22,7 @@ group :development do
   gem "binding_of_caller"
   gem "guard-puma"
   gem "guard-coffeescript"
+  gem "guard-shell"
   gem "therubyracer"
 end
 

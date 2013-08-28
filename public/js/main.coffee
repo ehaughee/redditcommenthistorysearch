@@ -110,13 +110,15 @@ generateResultTemplate = (comments, currentPage, itemsPerPage) ->
   pageCount = Math.ceil(comments.length/itemsPerPage)
   currentItem =
     if (currentPage * itemsPerPage) < comments.length
-    then (currentPage * itemsPerPage)
-    else comments.length
+      (currentPage * itemsPerPage)
+    else 
+      comments.length
 
   begin =
     if currentItem - itemsPerPage >= 0
-    then currentItem - itemsPerPage
-    else 0
+      currentItem - itemsPerPage
+    else 
+      0
 
   end = currentItem
 

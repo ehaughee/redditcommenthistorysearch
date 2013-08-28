@@ -41,7 +41,7 @@ $(document).ready ->
         search_user_check_display.attr "class", classes
     else
       html = "<b>?</b>"
-      classes = "lable round secondary"
+      classes = "label round secondary"
 
     search_user_check_display.html html
     search_user_check_display.attr "class", classes
@@ -102,10 +102,10 @@ registerPaginationClickEvent = ->
     else
       console.log "No comments to paginate!"
 
-generateResultTemplate = (comments, currentPage, itemsPerPage) ->
+generateResultTemplate = (comments, currentPage = 1, itemsPerPage = 3) ->
   template = Handlebars.compile(commentTemplate)
-  itemsPerPage = 3 if not itemsPerPage? || itemsPerPage < 1
-  currentPage = 1 if not currentPage? || currentPage < 1
+  itemsPerPage = 3 if itemsPerPage < 1
+  currentPage = 1 if currentPage < 1
 
   pageCount = Math.ceil(comments.length/itemsPerPage)
   currentItem =
@@ -155,7 +155,7 @@ paginationTemplate = """
         </li>
       {{/paginate}}
       {{#paginate pagination type="middle" limit="7"}}
-        <li {{#if active}}class="current"{{/if}}>
+        <li{{#if active}} class="current"{{/if}}>
           <a href="#" data-pagenumber="{{n}}" data-pageoperation="mid" class="paginate_link">{{n}}</a>
         </li>
       {{/paginate}}

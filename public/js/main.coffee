@@ -31,8 +31,8 @@ $(document).ready ->
           html = "<b>&#x2714;</b>"
           classes = "label round success"
         else if data.found is false
-          html = "<b>&#x2714;</b>"
-          classes = "label round success"
+          html = "<b>&#x2717;</b>"
+          classes = "label round alert"
         else
           html = "<b>Err</b>"
           classes = "label round secondary"
@@ -102,10 +102,10 @@ registerPaginationClickEvent = ->
     else
       console.log "No comments to paginate!"
 
-generateResultTemplate = (comments, currentPage = 1, itemsPerPage = 3) ->
+generateResultTemplate = (comments, currentPage, itemsPerPage) ->
   template = Handlebars.compile(commentTemplate)
-  itemsPerPage = 3 if itemsPerPage < 1
-  currentPage = 1 if currentPage < 1
+  itemsPerPage = 3 if not itemsPerPage? || itemsPerPage < 1
+  currentPage = 1 if not currentPage? || currentPage < 1
 
   pageCount = Math.ceil(comments.length/itemsPerPage)
   currentItem =

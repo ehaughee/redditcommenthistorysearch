@@ -35,8 +35,8 @@
             html = "<b>&#x2714;</b>";
             classes = "label round success";
           } else if (data.found === false) {
-            html = "<b>&#x2714;</b>";
-            classes = "label round success";
+            html = "<b>&#x2717;</b>";
+            classes = "label round alert";
           } else {
             html = "<b>Err</b>";
             classes = "label round secondary";
@@ -46,7 +46,7 @@
         });
       } else {
         html = "<b>?</b>";
-        classes = "lable round secondary";
+        classes = "label round secondary";
       }
       search_user_check_display.html(html);
       return search_user_check_display.attr("class", classes);
@@ -154,7 +154,7 @@
     return pieces;
   });
 
-  paginationTemplate = "<div class=\"pagination pagination-centered\">\n  <ul>\n    {{#paginate pagination type=\"previous\"}}\n      <li class=\"arrow{{#if disabled}} unavailable{{/if}}\">\n        <a href=\"#\" data-pagenumber=\"{{n}}\" data-pageoperation=\"prev\" class=\"paginate_link\" >Prev</a>\n      </li>\n    {{/paginate}}\n    {{#paginate pagination type=\"middle\" limit=\"7\"}}\n      <li {{#if active}}class=\"current\"{{/if}}>\n        <a href=\"#\" data-pagenumber=\"{{n}}\" data-pageoperation=\"mid\" class=\"paginate_link\">{{n}}</a>\n      </li>\n    {{/paginate}}\n    {{#paginate pagination type=\"next\"}}\n      <li class=\"arrow{{#if disabled}} unavailable{{/if}}\">\n        <a href=\"#\" data-pagenumber=\"{{n}}\" data-pageoperation=\"next\" class=\"paginate_link\">Next</a>\n      </li>\n    {{/paginate}} \n  </ul>\n</div>";
+  paginationTemplate = "<div class=\"pagination pagination-centered\">\n  <ul>\n    {{#paginate pagination type=\"previous\"}}\n      <li class=\"arrow{{#if disabled}} unavailable{{/if}}\">\n        <a href=\"#\" data-pagenumber=\"{{n}}\" data-pageoperation=\"prev\" class=\"paginate_link\" >Prev</a>\n      </li>\n    {{/paginate}}\n    {{#paginate pagination type=\"middle\" limit=\"7\"}}\n      <li{{#if active}} class=\"current\"{{/if}}>\n        <a href=\"#\" data-pagenumber=\"{{n}}\" data-pageoperation=\"mid\" class=\"paginate_link\">{{n}}</a>\n      </li>\n    {{/paginate}}\n    {{#paginate pagination type=\"next\"}}\n      <li class=\"arrow{{#if disabled}} unavailable{{/if}}\">\n        <a href=\"#\" data-pagenumber=\"{{n}}\" data-pageoperation=\"next\" class=\"paginate_link\">Next</a>\n      </li>\n    {{/paginate}} \n  </ul>\n</div>";
 
   commentTemplate = paginationTemplate + "{{#each comments}}\n  <div class='row panel comment_well'>\n    <div class='row'>\n      <div class='large-12 columns comment_body'>\n        {{body}}\n      </div>\n    </div>\n    <hr />\n    <div class='row comment_footer'>\n        <div class='large-8 columns comment_author'>\n          - {{author}}\n        </div>\n        <div class='large-4 columns comment_links'>\n          <a href='http://reddit.com/comments/{{split link_id \"_\" 1}}/_/{{id}}' target='_blank'>View on Reddit</a>\n        </div>\n    </div>\n  </div>\n{{/each}}" + paginationTemplate;
 
